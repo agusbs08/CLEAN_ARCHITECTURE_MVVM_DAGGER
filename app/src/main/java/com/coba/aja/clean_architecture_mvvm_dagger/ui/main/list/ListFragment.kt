@@ -2,6 +2,7 @@ package com.coba.aja.clean_architecture_mvvm_dagger.ui.main.list
 
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.coba.aja.clean_architecture_mvvm_dagger.R
 import com.coba.aja.clean_architecture_mvvm_dagger.databinding.FragmentListBinding
@@ -20,6 +21,8 @@ class ListFragment : BindingFragment<FragmentListBinding, ListViewModel>(), Repo
 
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
         binding.recyclerView.adapter = RepoListRecyclerViewAdapter(viewModel, this, this)
+
+        observableViewModel()
     }
 
     override fun onRepoSelectedListener(repo: Repo?) {
@@ -29,6 +32,32 @@ class ListFragment : BindingFragment<FragmentListBinding, ListViewModel>(), Repo
             .replace(R.id.screenContainer, DetailFragment())
             .addToBackStack(null)
             .commit()
+    }
 
+    fun observableViewModel() {
+
+        viewModel.getRepos().observe(viewLifecycleOwner, Observer { t -> {
+            if(t != null) {
+                binding.recyclerView.visibility = View.VISIBLE
+            }
+        } })
+
+        viewModel.getError().observe(viewLifecycleOwner, Observer { t -> {
+            if(t != null && t == true) {
+                binding.tvError.visibility = View.VISIBLE
+                binding.recyclerView.visibility = View.GONE
+                binding.tvError.setText("An Error Occurred While Loading Data")
+            } else {
+                binding.tvError.visibility = View.GONE
+            }
+        } })
+
+        viewModel.getLoading().observe(viewLifecycleOwner, Observer { t -> {
+            if(t != null && t == true) {
+                showProgressDialog()
+            } else {
+                hideProgressDialog()
+            }
+        } })
     }
 }
