@@ -1,0 +1,2 @@
+include ':app'
+rootProject.name = "Clean_Architecture_MVVM_DAGGER"
